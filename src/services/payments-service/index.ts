@@ -20,7 +20,9 @@ async function getPaymentByTicketId(ticketId: number, loggedUserId: number) {
 }
 
 async function postNewPayment(params: CreatePaymentWithCardData, loggedUserId: number) {
-  const value = await ticketRepository.findTicketPriceAndUserId(params.ticketId);
+  const { ticketId, cardData } = params;
+
+  const value = await ticketRepository.findTicketPriceAndUserId(ticketId);
 
   if (!value.userId) throw notFoundError("Ticket");
 
@@ -28,11 +30,13 @@ async function postNewPayment(params: CreatePaymentWithCardData, loggedUserId: n
 
   if (loggedUserId !== ticketUserId) throw unauthorizedError();
 
+  await ticketRepository.updateTicketStatusById(ticketId);
+
   return paymentRepository.createPayment({
-    ticketId: params.ticketId,
+    ticketId,
     value: value.price,
-    cardIssuer: params.cardData.issuer,
-    cardLastDigits: params.cardData.number.toString().slice(-4),
+    cardIssuer: cardData.issuer,
+    cardLastDigits: cardData.number.toString().slice(-4),
   });
 }
 
