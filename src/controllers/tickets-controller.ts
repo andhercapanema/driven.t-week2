@@ -28,3 +28,15 @@ export async function getTicketByUser(req: AuthenticatedRequest, res: Response) 
     }
   }
 }
+
+export async function getTicketTypes(req: AuthenticatedRequest, res: Response) {
+  try {
+    const ticketTypes = await ticketsService.getTicketTypes();
+
+    return res.status(httpStatus.OK).send(ticketTypes);
+  } catch (error) {
+    if (error.name === "NotFoundError") {
+      return res.status(httpStatus.NOT_FOUND).send(error.message);
+    }
+  }
+}
