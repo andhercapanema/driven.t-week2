@@ -8,8 +8,20 @@ export async function postCreateTicket(req: AuthenticatedRequest, res: Response)
     const createdTicket = await ticketsService.createTicket(req.body, req.userId);
 
     return res.status(httpStatus.CREATED).send(createdTicket);
+  } catch (error) {
+    if (error.name === "NotFoundError") {
+      return res.status(httpStatus.NOT_FOUND).send(error.message);
+    }
+  }
+}
 
-    // return res.sendStatus(httpStatus.OK);
+export async function getTicketByUser(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req;
+
+  try {
+    const userTicket = await ticketsService.getTicketByUserId(userId);
+
+    return res.status(httpStatus.OK).send(userTicket);
   } catch (error) {
     if (error.name === "NotFoundError") {
       return res.status(httpStatus.NOT_FOUND).send(error.message);
