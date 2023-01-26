@@ -51,6 +51,11 @@ async function createOrUpdateEnrollmentWithAddress(params: CreateOrUpdateEnrollm
   const newEnrollment = await enrollmentRepository.upsert(params.userId, enrollment, exclude(enrollment, "userId"));
 
   await addressRepository.upsert(newEnrollment.id, address, address);
+
+  if (newEnrollment.createdAt === newEnrollment.updatedAt) {
+    return "insert";
+  }
+  return "update";
 }
 
 function getAddressForUpsert(address: CreateAddressParams) {
