@@ -38,6 +38,30 @@ async function findAllTicketTypes(): Promise<TicketType[]> {
   return prisma.ticketType.findMany();
 }
 
+async function findTicketPriceAndUserId(ticketId: number) {
+  const ticket = await prisma.ticket.findUnique({
+    where: {
+      id: ticketId,
+    },
+    select: {
+      TicketType: {
+        select: {
+          price: true,
+        },
+      },
+      Enrollment: {
+        select: {
+          userId: true,
+        },
+      },
+    },
+  });
+  return {
+    price: ticket?.TicketType?.price,
+    userId: ticket?.Enrollment?.userId,
+  };
+}
+
 export type CreateTicketParams = Omit<Ticket, "id" | "createdAt" | "updatedAt" | "status">;
 
 export type TicketWithTicketType = Ticket & {
@@ -49,6 +73,7 @@ const ticketRepository = {
   findTicketByEnrollmentId,
   findTicketWithTicketTypeById,
   findAllTicketTypes,
+  findTicketPriceAndUserId,
 };
 
 export default ticketRepository;
