@@ -12,8 +12,7 @@ async function getPaymentByTicketId(ticketId: number, loggedUserId: number) {
 
   if (!paymentWithUserId) throw notFoundError("Payment");
 
-  const paymentUserId = paymentWithUserId.Ticket.Enrollment.userId;
-
+  const paymentUserId = paymentWithUserId?.Ticket?.Enrollment?.userId;
   if (loggedUserId !== paymentUserId) throw unauthorizedError();
 
   return exclude(paymentWithUserId, "Ticket");
